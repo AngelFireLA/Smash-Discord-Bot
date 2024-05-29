@@ -1,61 +1,7 @@
-# #Catégories, bonne images, mais pas assez d'infos sur les images
-# from anime_api.apis import NekosAPI
-# import anime_api.apis.nekos_api as nekos_api
-# from anime_api.apis.nekos_api import Image
-# nekos = NekosAPI()
-# #categories :  Kemonomimi, Catgirl, Girl, Maid, Loli, Beach,  Mountain
-# image: Image = nekos.get_characters(search="%?marin%?")
-# #print(image)
-#
-# import requests
-#
-# def search_character(name):
-#     url = "https://api.nekosapi.com/v2/characters"
-#     headers = {"Accept": "application/vnd.api+json"}
-#     params = {"filter[lastName.icontains]": name}
-#
-#     response = requests.get(url, headers=headers, params=params)
-#     print(response.status_code)
-#     if response.status_code == 200:
-#         data = response.json()
-#         if "data" in data:
-#             characters = data["data"]
-#             print(characters)
-#             for c in characters:
-#                 print(c["attributes"]["file"])
-#                 print()
-#             #print(characters["attributes"]["file"])
-#
-#         else:
-#             print("No characters found.")
-#     else:
-#         print("Error occurred while searching for characters.")
-
-# # Example usage
-# search_character("nagatoro")
 
 
-# import anime_api.apis.nekos_best as nekos_best
-# from anime_api.apis.nekos_best import ImageCategory
-#
-# neko = nekos_best.NekosBest()
-#
-# #categories : KITSUNE, NEKO, WAIFU
-# print(neko.get_random_images(ImageCategory.))
 
-# import anime_api.apis.waifu_im as nekos_best
-# from anime_api.apis.waifu_im import ImageTag
-#
-#
-# neko = nekos_best.WaifuImAPI()
-# #categories : SELFIES, OPPAI, WAIFU, MAID, UNIFORM
-# print(neko.get_random_image(is_gif=False,tags=[ImageTag.SFW.]))
 
-# import  anime_api.apis.nekos_moe as animu
-#
-# animu = animu.NekosMoeAPI()
-#
-# print(animu.search_images())
 
 
 # # Cleans characters file
@@ -174,7 +120,7 @@ import pandas as pd
 import sqlite3
 
 # Read the CSV file
-df = pd.read_csv('anime_characters_edited.csv')
+df = pd.read_csv('csv_files/anime_characters_edited.csv')
 
 # Connect to the SQLite database
 conn = sqlite3.connect('anime.db')

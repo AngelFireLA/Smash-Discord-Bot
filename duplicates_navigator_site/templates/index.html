@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duplicate Image Checker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Duplicate Image Checker</h1>
+    <div class="container">
+        {% for hash, paths in duplicates.items() %}
+            <div class="duplicate-set">
+                <h2>Hash: {{ hash }}</h2>
+                <div class="images">
+                    {% for path in paths %}
+                        <div class="image-container">
+                            <p>{{ path }}|||</p>
+                            <img src="{{ url_for('static', filename=path) }}" alt="Duplicate Image">
+                            <form action="/delete" method="post" style="display: inline;">
+                                <input type="hidden" name="file_to_delete" value="{{ path }}">
+                                <button type="submit">Delete</button>
+                            </form>
+                            <form action="/keep" method="post" style="display: inline;">
+                                <button type="submit">Keep</button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

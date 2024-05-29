@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Model Predictions</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f0f0;
+    }
+
+    #image-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-height: 80vh;
+    }
+
+    #image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .checkbox-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .prediction-container {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="image-container">
+    <img id="image" src="" alt="Image for prediction">
+  </div>
+  <div class="checkbox-container">
+    {% for model_name in model_names %}
+    <label>
+      <input type="checkbox" class="model-checkbox" value="{{ loop.index0 }}"> {{ model_name }}
+    </label>
+    {% endfor %}
+  </div>
+  <button onclick="predict()">Predict</button>
+  <div class="prediction-container"></div>
+
+  <script>
+    function loadRandomImage() {
+      $.get('/next_image', function(data) {
+        if (data.image_path) {
+          $('#image').attr('src', data.image_path);
+        } else {
+          alert("No more images to predict!");
+        }
+      });
+    }
+
+    function predict() {
+      let imagePath = $('#image').attr('src');
+      let selectedModels = $('.model-checkbox:checked').map(function() {
+        return $(this).val();
+      }).get();
+
+      $.ajax({
+        url: '/predict',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ image_path: imagePath, selected_models: selectedModels }),
+        success: function(response) {
+          let predictionContainer = $('.prediction-container');
+          predictionContainer.empty();
+          response.predictions.forEach(function(prediction) {
+            let predictionText = `${prediction.model_name}: ${(prediction.prediction * 100).toFixed(2)}% Smash`;
+            predictionContainer.append(`<p>${predictionText}</p>`);
+          });
+        }
+      });
+    }
+
+    $(document).ready(function() {
+      loadRandomImage();
+    });
+  </script>
+</body>
+</html>

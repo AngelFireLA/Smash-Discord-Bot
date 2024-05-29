@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Image Labeling</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+
+    #image-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-grow: 1;
+      max-height: 60vh;
+    }
+
+    #image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    #button-container {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .btn-custom {
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .predict {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .predict:hover {
+      background-color: #45a049;
+    }
+
+    .loading {
+      display: none;
+    }
+
+    .loading img {
+      width: 50px;
+      height: 50px;
+    }
+
+    .prediction-result {
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .label-checkbox, .image-type-radio, .subdataset-select {
+      margin-top: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .model-prediction {
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    .model-prediction h5 {
+      margin-bottom: 10px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .model-prediction button {
+      display: block;
+      width: 100%;
+      max-width: 150px;
+      margin: 0 auto;
+    }
+
+    /* Loading animation */
+    .spinner {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: #007bff;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+      .ai-score-range {
+  margin-top: 20px;
+}
+
+  </style>
+</head>
+<body>
+  <div id="model-predictions" class="mt-4">
+    <div class="d-flex justify-content-center mb-3">
+      <div class="model-prediction mx-4">
+        <h5>Model 1 Prediction:</h5>
+        <button id="predict-btn-1" class="btn btn-custom predict" onclick="predict(1)">Predict</button>
+        <div id="prediction-result-1" class="prediction-result"></div>
+      </div>
+      <div class="model-prediction mx-4">
+        <h5>Model 2 Prediction:</h5>
+        <button id="predict-btn-2" class="btn btn-custom predict" onclick="predict(2)">Predict</button>
+        <div id="prediction-result-2" class="prediction-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="image-container">
+    <img id="image" src="" alt="Image for labeling">
+  </div>
+
+  <div id="button-container">
+    <button class="btn btn-danger btn-custom delete hidden" onclick="labelImage('delete')">Delete</button>
+    <button class="btn btn-primary btn-custom pass" onclick="labelImage('pass')">Pass</button>
+    <button class="btn btn-success btn-custom smash" onclick="labelImage('smash')">Smash</button>
+  </div>
+
+  <div class="form-check label-checkbox">
+    <input type="checkbox" class="form-check-input" id="labeling-mode" onclick="toggleLabelingMode()">
+    <label class="form-check-label" for="labeling-mode">Labeling Mode</label>
+  </div>
+
+  <div class="image-type-radio form-check form-check-inline">
+    <input class="form-check-input" type="radio" name="imageType" id="normal" value="normal" checked>
+    <label class="form-check-label" for="normal">Normal</label>
+  </div>
+  <div class="image-type-radio form-check form-check-inline">
+    <input class="form-check-input" type="radio" name="imageType" id="my-labeled" value="my_labeled">
+    <label class="form-check-label" for="my-labeled">My Labeled</label>
+  </div>
+  <div class="image-type-radio form-check form-check-inline">
+    <input class="form-check-input" type="radio" name="imageType" id="any-labeled" value="any_labeled">
+    <label class="form-check-label" for="any-labeled">Any Labeled</label>
+  </div>
+
+  <div class="form-group subdataset-select">
+    <label for="subdataset">Select Subdataset:</label>
+    <select class="form-control" id="subdataset">
+      <option value="normal">Normal</option>
+      <option value="dataset gatherer/fullbody/resized_ganime_fullbody_ultraclean">Ganime Fullbody Ultraclean</option>
+      <option value="dataset gatherer/nekos_api/images_nekosapi">Nekos API</option>
+      <option value="dataset gatherer/nekos_best/nekos_best_images">Nekos Best Images</option>
+      <option value="dataset gatherer/nekos_moe/images">Nekos Moe</option>
+      <option value="dataset gatherer/waifu_im/waifu_images">Waifu Im</option>
+      <option value="dataset gatherer/waifu_pics/images">Waifu Pics</option>
+    </select>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+  </div>
+  <div class="form-group ai-score-range">
+    <label for="min-ai-score">Min AI Score:</label>
+    <input type="number" class="form-control" id="min-ai-score" step="0.01" min="0" max="1">
+  </div>
+  <div class="form-group ai-score-range">
+    <label for="max-ai-score">Max AI Score:</label>
+    <input type="number" class="form-control" id="max-ai-score" step="0.01" min="0" max="1">
+  </div>
+  <div class="form-group">
+    <label for="tags">Tags/Characters (comma separated):</label>
+    <input type="text" class="form-control" id="tags" placeholder="Enter tags or characters">
+  </div>
+  <div class="form-check form-check-inline">
+    <input class="form-check-input" type="radio" name="tagOption" id="all-tags" value="all" checked>
+    <label class="form-check-label" for="all-tags">All Tags</label>
+  </div>
+  <div class="form-check form-check-inline">
+    <input class="form-check-input" type="radio" name="tagOption" id="any-tags" value="any">
+    <label class="form-check-label" for="any-tags">Any Tag</label>
+  </div>
+
+
+  <script>
+    let user;
+
+    $(document).ready(function() {
+      user = prompt("Enter your username:");
+      if (user) {
+        loadNextImage();
+        toggleLabelingMode(); // Initial check
+      } else {
+        alert("Username is required to proceed.");
+      }
+    });
+
+function loadNextImage() {
+  let imageType = $('input[name="imageType"]:checked').val();
+  let subdataset = $('#subdataset').val();
+  let minAiScore = $('#min-ai-score').val();
+  let maxAiScore = $('#max-ai-score').val();
+  let tags = $('#tags').val();
+  let tagOption = $('input[name="tagOption"]:checked').val();
+
+  $.get('/next_image', {
+    image_type: imageType,
+    user: user,
+    subdataset: subdataset,
+    min_ai_score: minAiScore,
+    max_ai_score: maxAiScore,
+    tags: tags,
+    tag_option: tagOption
+  }, function(data) {
+    if (data.image_path) {
+      $('#image').attr('src', data.image_path);
+      $('#prediction-result-1').text('');
+      $('#prediction-result-2').text('');
+    } else {
+      alert("No more images to label!");
+    }
+  });
+}
+
+
+    function labelImage(label) {
+      let imagePath = $('#image').attr('src');
+      if ($('#labeling-mode').is(':checked')) {
+        $.ajax({
+          url: '/label_image',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ image_path: imagePath, label: label, user: user }),
+          success: function(response) {
+            if (response.status === 'success') {
+              loadNextImage();
+            }
+          }
+        });
+      } else {
+        loadNextImage();
+      }
+    }
+
+    function predict(modelNumber) {
+      let imagePath = $('#image').attr('src');
+      let buttonId = `#predict-btn-${modelNumber}`;
+      let resultId = `#prediction-result-${modelNumber}`;
+
+      $(buttonId).hide();
+      $(resultId).html('<div class="spinner"></div>');
+
+      $.ajax({
+        url: '/predict',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ image_path: imagePath, model_number: modelNumber }),
+        success: function(response) {
+          if (response.label && response.confidence) {
+            let resultText = `${response.label}! (${response.confidence})`;
+            $(resultId).text(resultText);
+          }
+        },
+        complete: function() {
+          $(buttonId).show();
+        }
+      });
+    }
+
+    function toggleLabelingMode() {
+      if ($('#labeling-mode').is(':checked')) {
+        $('.delete').removeClass('hidden');
+      } else {
+        $('.delete').addClass('hidden');
+      }
+    }
+
+  </script>
+</body>
+</html>

@@ -157,7 +157,7 @@ async def get_character_image(mode, c_id, character_name=None):
         }
         async with aiohttp.ClientSession(headers=headers) as session:
             url = None
-            with open("anime_characters_links_full.csv", newline='', encoding='utf-8') as csvfile:
+            with open("csv_files/anime_characters_links_full.csv", newline='', encoding='utf-8') as csvfile:
                 reader = csv.DictReader(csvfile)
                 for row in reader:
                     if row["Name"] == character_name:
@@ -223,7 +223,7 @@ async def get_character_image(mode, c_id, character_name=None):
         }
         async with aiohttp.ClientSession(headers=headers) as session:
             url = None
-            with open("anime_characters_links_full.csv", newline='', encoding='utf-8') as csvfile:
+            with open("csv_files/anime_characters_links_full.csv", newline='', encoding='utf-8') as csvfile:
                 reader = csv.DictReader(csvfile)
                 for row in reader:
                     if row["Name"] == character_name:
@@ -344,7 +344,7 @@ async def get_all_characters():
     return all_characters
 
 
-TOKEN = 'MTE0MTMzMTIwNzQ0Mzk5MjY5Nw.GO6o-i.mTfzfvsrcunUpqK-cQ_aLqO78Jx8Bgj2qbUX6Q'
+TOKEN = 'your_token'
 
 bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 

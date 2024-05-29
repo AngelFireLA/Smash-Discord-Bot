@@ -1,0 +1,7 @@
+
+/.idea
+labeling_website/static/dataset gatherer/
+*.npy
+*.h5
+labeling_website/images.db
+ai/chatgpt_trainers/

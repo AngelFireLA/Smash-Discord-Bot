@@ -45,7 +45,7 @@ async def parse_character_page(html, character_name):
     return data
 
 async def main():
-    df = pd.read_csv('anime_characters_links.csv')
+    df = pd.read_csv('csv_files/anime_characters_links.csv')
 
     # Extract 'Name' and 'Link' columns and create a list of tuples
     character_ids = list(zip(df['Name'], df['Link']))
@@ -72,7 +72,7 @@ async def main():
                 # Fill missing values with 0s
                 df.fillna(0, inplace=True)
 
-                with open('anime_characters_no_edit.csv', 'a', newline='', encoding='utf-8') as f:
+                with open('csv_files/anime_characters_no_edit.csv', 'a', newline='', encoding='utf-8') as f:
                     df.to_csv(f, header=f.tell() == 0, index=False)
             print(f"Hello {i}!")
 
