@@ -5,3 +5,7 @@ labeling_website/static/dataset gatherer/
 *.h5
 labeling_website/images.db
 ai/chatgpt_trainers/
+/labeling_website/smash
+.idea/misc.xml
+.idea/Smash-Discord-Bot.iml
+duplicates_navigator_site/__pycache__/duplicates_dict.cpython-311.pyc

@@ -29,7 +29,7 @@ def is_valid_score(score):
         return False
 
 # Fetch all images with invalid or no ai_score
-cursor.execute('SELECT id, direct_path, ai_score FROM images')
+cursor.execute('SELECT id, direct_path, ai_score FROM images WHERE ai_score IS NULL')
 images = cursor.fetchall()
 
 total_images = len(images)
